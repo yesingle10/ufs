@@ -63,6 +63,12 @@
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- H2（dev-local profile 内存库，零依赖跑通） -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <!-- 消息（审计异步落盘，对齐 Java 规范 §9 / 安全规范） -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>

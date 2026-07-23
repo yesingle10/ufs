@@ -2,17 +2,17 @@ package com.ufs.core.auth;
 
 import com.ufs.core.common.error.UfsErrorCode;
 import com.ufs.core.common.error.UfsException;
+import com.ufs.core.config.CachingRequestFilter;
+import com.ufs.core.config.KeyValueStore;
 import com.ufs.core.config.properties.UfsProperties;
 import com.ufs.core.tenant.TenantContextHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -30,14 +30,14 @@ public class UfsAuthInterceptor implements HandlerInterceptor {
 
     private final JwtService jwtService;
     private final CredentialResolver credentialResolver;
-    private final StringRedisTemplate redis;
+    private final KeyValueStore kvStore;
     private final UfsProperties props;
 
     public UfsAuthInterceptor(JwtService jwtService, CredentialResolver credentialResolver,
-                             StringRedisTemplate redis, UfsProperties props) {
+                             KeyValueStore kvStore, UfsProperties props) {
         this.jwtService = jwtService;
         this.credentialResolver = credentialResolver;
-        this.redis = redis;
+        this.kvStore = kvStore;
         this.props = props;
     }
 
@@ -85,8 +85,8 @@ public class UfsAuthInterceptor implements HandlerInterceptor {
         if (skew > props.getSignTtlSeconds() * 1000) {
             throw new UfsException(UfsErrorCode.UNAUTHORIZED, "timestamp skew too large");
         }
-        if (Boolean.FALSE.equals(redis.opsForValue().setIfAbsent("ufs:nonce:" + nonce, "1",
-                Duration.ofSeconds(props.getNonceTtlSeconds())))) {
+        if (!kvStore.setIfAbsent("ufs:nonce:" + nonce, "1",
+                Duration.ofSeconds(props.getNonceTtlSeconds()))) {
             throw new UfsException(UfsErrorCode.RATE_LIMITED, "replay detected");
         }
 
@@ -102,13 +102,8 @@ public class UfsAuthInterceptor implements HandlerInterceptor {
     }
 
     private String readBody(HttpServletRequest request) {
-        if (request instanceof ContentCachingRequestWrapper w) {
-            try {
-                w.getInputStream().readAllBytes(); // 触发缓存
-            } catch (java.io.IOException ignored) {
-                // 缓存触发失败不影响后续 getContentAsByteArray
-            }
-            byte[] bytes = w.getContentAsByteArray();
+        if (request instanceof CachingRequestFilter.CachedBodyHttpServletRequest w) {
+            byte[] bytes = w.getCachedBody();
             return new String(bytes, StandardCharsets.UTF_8);
         }
         return "";
