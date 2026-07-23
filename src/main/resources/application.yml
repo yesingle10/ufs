@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ufs-core
+  datasource:
+    url: jdbc:mysql://localhost:3306/ufs_prod_00?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=UTC
+    username: ufs
+    password: ${UFS_DB_PASSWORD:ufs_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${UFS_REDIS_PASSWORD:}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  metrics:
+    tags:
+      application: ufs-core
+
+# UFS 自定义属性（对齐 UfsProperties）
+ufs:
+  jwt-secret: ${UFS_JWT_SECRET:dev-only-change-me-please-32bytes-min!!}
+  jwt-ttl-seconds: 7200
+  sign-ttl-seconds: 300
+  nonce-ttl-seconds: 300
+  # 开发期凭证（生产由 KMS 注入，绝不落库/不进 Git）
+  app-credentials:
+    app_demo:
+      tenant-id: t_demo
+      app-secret: secret_demo
+  rocketmq:
+    namesrv-addr: localhost:9876
+    audit-topic: ufs_audit
+    producer-group: ufs_core_producer
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/ufs_dev?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=UTC

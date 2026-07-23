@@ -1,0 +1,19 @@
+# Build output
+target/
+target/maven/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env overrides (never commit real secrets)
+application-local.yml
+*.env
