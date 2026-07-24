@@ -13,7 +13,7 @@ COPY src/ src/
 RUN mvn package -DskipTests -B -q -DfinalName=ufs-core
 
 # ---- Stage 2: Runtime ----
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:25-jre-jammy
 WORKDIR /app
 
 # 非 root 运行
