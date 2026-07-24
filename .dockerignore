@@ -1,0 +1,10 @@
+target/
+.git/
+.gitignore
+*.md
+.idea/
+*.iml
+.vscode/
+mvn-local.sh
+logs/
+*.log
