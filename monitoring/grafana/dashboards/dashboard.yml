@@ -1,0 +1,11 @@
+# =============================================================================
+# Grafana Dashboard Provisioning — 自动加载 dashboard JSON
+# =============================================================================
+apiVersion: 1
+
+providers:
+  - name: 'UFS'
+    folder: 'UFS'
+    type: file
+    options:
+      path: /etc/grafana/provisioning/dashboards

@@ -1,13 +1,18 @@
 # UFS — Unified File Service
 
+[![CI](https://github.com/yesingle10/ufs/actions/workflows/ci.yml/badge.svg)](https://github.com/yesingle10/ufs/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/yesingle10/ufs/actions/workflows/codeql.yml/badge.svg)](https://github.com/yesingle10/ufs/actions/workflows/codeql.yml)
+[![Release](https://img.shields.io/github/v/release/yesingle10/ufs?color=blue)](https://github.com/yesingle10/ufs/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 Multi-tenant, multi-cloud unified file service. Abstracts COS / OSS / Kodo / TOS behind a single REST API with built-in presigned upload/download, policy routing, audit trail, and recycle bin.
 
 ## Repositories
 
-| Repo | Stack | Tests | CI |
-|------|-------|-------|----|
-| **[ufs-core](https://github.com/yesingle10/ufs)** | Spring Boot 3.2 / Java 17 / MyBatis | 65 ✅ | [![CI](https://github.com/yesingle10/ufs/actions/workflows/ci.yml/badge.svg)](https://github.com/yesingle10/ufs/actions/workflows/ci.yml) |
-| **[ufs-client](https://github.com/yesingle10/ufs-client)** | OkHttp 4.12 / Jackson / JWT | 23 ✅ | [![CI](https://github.com/yesingle10/ufs-client/actions/workflows/ci.yml/badge.svg)](https://github.com/yesingle10/ufs-client/actions/workflows/ci.yml) |
+| Repo | Stack | Coverage | CI |
+|------|-------|----------|----|
+| **[ufs-core](https://github.com/yesingle10/ufs)** | Spring Boot 3.2 / Java 17 / MyBatis | 65 tests | [![CI](https://github.com/yesingle10/ufs/actions/workflows/ci.yml/badge.svg)](https://github.com/yesingle10/ufs/actions/workflows/ci.yml) |
+| **[ufs-client](https://github.com/yesingle10/ufs-client)** | OkHttp 4.12 / Jackson / JWT | 23 tests | [![CI](https://github.com/yesingle10/ufs-client/actions/workflows/ci.yml/badge.svg)](https://github.com/yesingle10/ufs-client/actions/workflows/ci.yml) |
 | **[ufs-console](https://github.com/yesingle10/ufs-console)** | Vue 3 / Vite 5 / Tailwind 3 | Build ✅ | [![CI](https://github.com/yesingle10/ufs-console/actions/workflows/ci.yml/badge.svg)](https://github.com/yesingle10/ufs-console/actions/workflows/ci.yml) |
 | **[ufs-sdk-example](https://github.com/yesingle10/ufs-sdk-example)** | Maven exec demo | — | — |
 
@@ -95,7 +100,9 @@ Full interactive docs: `/swagger-ui.html`
 ## Deployment
 
 - **Docker Compose**: `docker compose up -d` (MySQL 8 + Redis 7 + ufs-core)
-- **CI/CD**: GitHub Actions test on push/PR, Docker publish on main, SDK deploy on tag
+- **CI/CD**: GitHub Actions test + JaCoCo coverage on push/PR, Docker publish on main, CodeQL security scan weekly
+- **Monitoring**: Prometheus + Grafana dashboard (see [monitoring/](monitoring/))
+- **Kubernetes**: Helm chart (see [helm/ufs/](helm/ufs/))
 
 ## Docs
 

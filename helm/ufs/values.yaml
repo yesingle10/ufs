@@ -1,0 +1,191 @@
+# =============================================================================
+# UFS Core Helm Chart — Default Values
+# =============================================================================
+
+# ---- Image ----
+image:
+  repository: ghcr.io/yesingle10/ufs
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# ---- Image Pull Secrets (for private registries) ----
+imagePullSecrets: []
+
+# ---- Deployment ----
+replicaCount: 2
+
+# ---- Spring profile ----
+springProfiles: docker
+
+# ---- Service ----
+service:
+  type: ClusterIP
+  port: 8080
+
+# ---- Ingress ----
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+    # nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+  hosts:
+    - host: ufs.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+    # - secretName: ufs-tls
+    #   hosts:
+    #     - ufs.local
+
+# ---- Resources ----
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# ---- Probes ----
+probes:
+  liveness:
+    path: /actuator/health
+    initialDelaySeconds: 60
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  startup:
+    path: /actuator/health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
+
+# ---- Security Context ----
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# ---- Horizontal Pod Autoscaler ----
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# ---- MySQL (embedded sub-chart) ----
+mysql:
+  enabled: true
+  image: mysql:8.0
+  database: ufs
+  user: ufs
+  rootPassword: change-me-root
+  password: change-me-user
+  port: 3306
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+# ---- Redis (embedded sub-chart) ----
+redis:
+  enabled: true
+  image: redis:7-alpine
+  password: ""
+  port: 6379
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# ---- Application Secrets ----
+# These values should be overridden in production via --set or external secrets
+secrets:
+  jwtSecret: change-me-min-32-bytes-long-secret-key
+  # Cloud storage credentials (leave empty to use local storage)
+  cos:
+    secretId: ""
+    secretKey: ""
+    region: ""
+    defaultBucket: ""
+  oss:
+    accessKeyId: ""
+    accessKeySecret: ""
+    endpoint: ""
+    defaultBucket: ""
+  kodo:
+    accessKey: ""
+    secretKey: ""
+    defaultBucket: ""
+  tos:
+    accessKeyId: ""
+    accessKeySecret: ""
+    endpoint: ""
+    region: ""
+    defaultBucket: ""
+
+# ---- Application Config (non-sensitive) ----
+config:
+  serverPort: 8080
+  # Additional non-sensitive config can be added here
+  extraEnv: {}
+  # JAVA_OPTS: "-Xmx384m -Xms256m"
+
+# ---- Pod-level settings ----
+nodeSelector: {}
+tolerations: []
+affinity: {}
+# Spread pods across nodes
+# podAntiAffinity:
+#   preferredDuringSchedulingIgnoredDuringExecution:
+#     - weight: 100
+#       podAffinityTerm:
+#         labelSelector:
+#           matchLabels:
+#             app.kubernetes.io/name: ufs
+#         topologyKey: kubernetes.io/hostname
+
+# ---- PVC for local file storage ----
+persistence:
+  enabled: false
+  size: 20Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  mountPath: /app/data

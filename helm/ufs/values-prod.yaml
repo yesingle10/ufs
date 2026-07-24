@@ -1,0 +1,93 @@
+# =============================================================================
+# UFS Core Helm Chart — Production Override Values
+# Usage: helm install ufs ./helm/ufs -f helm/ufs/values-prod.yaml
+#
+# IMPORTANT: Override all secrets before deploying!
+#   helm install ufs ./helm/ufs -f helm/ufs/values-prod.yaml \
+#     --set secrets.jwtSecret=<your-jwt-secret> \
+#     --set mysql.rootPassword=<root-pass> \
+#     --set mysql.password=<user-pass>
+# =============================================================================
+
+replicaCount: 3
+
+springProfiles: docker,prod
+
+image:
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+# ---- Resources (higher for production) ----
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+# ---- HPA enabled ----
+hpa:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# ---- Ingress enabled ----
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  hosts:
+    - host: ufs.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: ufs-tls
+      hosts:
+        - ufs.example.com
+
+# ---- MySQL (consider external managed DB in production) ----
+mysql:
+  persistence:
+    size: 20Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+# ---- Redis ----
+redis:
+  persistence:
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ---- Probes (longer startup for production) ----
+probes:
+  startup:
+    failureThreshold: 36
+
+# ---- Pod anti-affinity to spread across nodes ----
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: ufs
+          topologyKey: kubernetes.io/hostname

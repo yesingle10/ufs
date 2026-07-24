@@ -100,10 +100,64 @@ services:
     networks:
       - ufs-net
 
+  # ===========================================================================
+  # 监控栈 — Prometheus + Grafana + Alertmanager
+  # ===========================================================================
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: ufs-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - ufs-net
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: ufs-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    networks:
+      - ufs-net
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: ufs-alertmanager
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - "${ALERTMANAGER_PORT:-9093}:9093"
+    networks:
+      - ufs-net
+
 volumes:
   mysql-data:
     driver: local
   redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
     driver: local
 
 networks:

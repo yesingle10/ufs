@@ -50,6 +50,14 @@ jobs:
           path: target/surefire-reports/
           retention-days: 7
 
+      - name: Upload JaCoCo Coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          retention-days: 7
+
   docker:
     name: Docker Build
     needs: test

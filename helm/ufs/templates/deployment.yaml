@@ -1,0 +1,246 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ufs.fullname" . }}
+  labels:
+    {{- include "ufs.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.hpa.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ufs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        # Force rollout when config/secret changes
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        {{- include "ufs.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if or .Values.mysql.enabled .Values.redis.enabled }}
+      initContainers:
+        {{- if .Values.mysql.enabled }}
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for MySQL at {{ include "mysql.fullname" . }}:{{ .Values.mysql.port }}"
+              until nc -z {{ include "mysql.fullname" . }} {{ .Values.mysql.port }} 2>/dev/null; do
+                echo "MySQL is not ready, retrying in 3s..."
+                sleep 3
+              done
+              echo "MySQL is up!"
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+        {{- end }}
+        {{- if .Values.redis.enabled }}
+        - name: wait-for-redis
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Redis at {{ include "redis.fullname" . }}:{{ .Values.redis.port }}"
+              until nc -z {{ include "redis.fullname" . }} {{ .Values.redis.port }} 2>/dev/null; do
+                echo "Redis is not ready, retrying in 3s..."
+                sleep 3
+              done
+              echo "Redis is up!"
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            # Spring profile
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springProfiles | quote }}
+            - name: SERVER_PORT
+              value: {{ .Values.config.serverPort | quote }}
+            # MySQL config
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_HOST
+              value: {{ include "mysql.fullname" . | quote }}
+            - name: MYSQL_PORT
+              value: {{ .Values.mysql.port | quote }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.database | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.user | quote }}
+            {{- end }}
+            # Redis config
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_HOST
+              value: {{ include "redis.fullname" . | quote }}
+            - name: REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            {{- end }}
+            # Secrets from Secret
+            - name: UFS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: jwt-secret
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: mysql-password
+            - name: UFS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: mysql-password
+            {{- end }}
+            {{- if .Values.redis.password }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: redis-password
+            {{- end }}
+            # Cloud storage credentials from Secret
+            - name: UFS_COS_SECRET_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: cos-secret-id
+            - name: UFS_COS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: cos-secret-key
+            - name: UFS_COS_REGION
+              value: {{ .Values.secrets.cos.region | quote }}
+            - name: UFS_COS_DEFAULT_BUCKET
+              value: {{ .Values.secrets.cos.defaultBucket | quote }}
+            - name: UFS_OSS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: oss-access-key-id
+            - name: UFS_OSS_ACCESS_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: oss-access-key-secret
+            - name: UFS_OSS_ENDPOINT
+              value: {{ .Values.secrets.oss.endpoint | quote }}
+            - name: UFS_OSS_DEFAULT_BUCKET
+              value: {{ .Values.secrets.oss.defaultBucket | quote }}
+            - name: UFS_KODO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: kodo-access-key
+            - name: UFS_KODO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: kodo-secret-key
+            - name: UFS_KODO_DEFAULT_BUCKET
+              value: {{ .Values.secrets.kodo.defaultBucket | quote }}
+            - name: UFS_TOS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: tos-access-key-id
+            - name: UFS_TOS_ACCESS_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ufs.secretName" . }}
+                  key: tos-access-key-secret
+            - name: UFS_TOS_ENDPOINT
+              value: {{ .Values.secrets.tos.endpoint | quote }}
+            - name: UFS_TOS_REGION
+              value: {{ .Values.secrets.tos.region | quote }}
+            - name: UFS_TOS_DEFAULT_BUCKET
+              value: {{ .Values.secrets.tos.defaultBucket | quote }}
+            # Extra env from config
+            {{- range $key, $val := .Values.config.extraEnv }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ufs.configmapName" $ }}
+                  key: {{ $key }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.serverPort }}
+              protocol: TCP
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          # ---- Startup Probe ----
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          # ---- Liveness Probe ----
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          # ---- Readiness Probe ----
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          # Writable tmp is always needed for readOnlyRootFilesystem
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          {{- if .Values.persistence.enabled }}
+            - name: ufs-data
+              mountPath: {{ .Values.persistence.mountPath }}
+          {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      {{- if .Values.persistence.enabled }}
+        - name: ufs-data
+          persistentVolumeClaim:
+            claimName: {{ include "ufs.pvcName" . }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

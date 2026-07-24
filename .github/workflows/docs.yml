@@ -1,0 +1,97 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/main/java/com/ufs/core/api/**'
+      - 'src/main/java/com/ufs/core/config/OpenApiConfig.java'
+      - 'src/main/java/com/ufs/core/model/dto/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Generate OpenAPI Spec
+        run: |
+          mvn compile -q
+          mvn spring-boot:start -Dspring-boot.run.profiles=dev-local -Dspring-boot.run.arguments="--server.port=0"
+          sleep 15
+          curl -s http://localhost:$(lsof -ti:8080 2>/dev/null || echo 0)/v3/api-docs | python3 -m json.tool > openapi.json
+          mvn spring-boot:stop -q || true
+
+      - name: Create Docs Site
+        run: |
+          mkdir -p _site
+          cat > _site/index.html << 'HTML'
+          <!DOCTYPE html>
+          <html lang="zh-CN">
+          <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>UFS API Documentation</title>
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+          <style>
+            body { margin: 0; background: #0f172a; }
+            .topbar { display: none; }
+            .swagger-ui .wrapper { max-width: 1460px; padding: 20px; }
+          </style>
+          </head>
+          <body>
+          <div id="swagger-ui"></div>
+          <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+          <script>
+          SwaggerUIBundle({
+            url: './openapi.json',
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            defaultModelsExpandDepth: 1,
+            defaultModelExpandDepth: 2,
+            docExpansion: 'list',
+            filter: true,
+            layout: 'BaseLayout'
+          });
+          </script>
+          </body>
+          </html>
+          HTML
+          cp openapi.json _site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

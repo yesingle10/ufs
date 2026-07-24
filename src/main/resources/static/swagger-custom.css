@@ -1,0 +1,207 @@
+/* =============================================================================
+ * UFS Swagger UI — Dark Theme Customization
+ * ============================================================================= */
+
+/* --- Top Bar --- */
+.swagger-ui .topbar {
+    background-color: #0f172a;
+    border-bottom: 2px solid #3b82f6;
+}
+.swagger-ui .topbar .wrapper {
+    max-width: 1460px;
+    padding: 8px 0;
+}
+.swagger-ui .topbar a {
+    display: flex;
+    align-items: center;
+}
+.swagger-ui .topbar .link::before {
+    content: "🗄️ UFS API";
+    font-size: 18px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-right: 12px;
+}
+.swagger-ui .topbar .link img {
+    display: none;
+}
+
+/* --- Info Section --- */
+.swagger-ui .info .title {
+    color: #f1f5f9;
+    font-size: 28px;
+}
+.swagger-ui .info {
+    margin: 20px 0;
+}
+.swagger-ui .info .description .renderedMarkdown {
+    color: #94a3b8;
+}
+
+/* --- Tags --- */
+.swagger-ui .opblock-tag {
+    color: #e2e8f0;
+    border-bottom: 1px solid #334155;
+}
+.swagger-ui .opblock-tag:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+
+/* --- Operations --- */
+.swagger-ui .opblock {
+    border-radius: 8px;
+    margin: 8px 0;
+    border: 1px solid #334155;
+    box-shadow: none;
+}
+.swagger-ui .opblock .opblock-summary {
+    border: none;
+    padding: 8px 16px;
+}
+.swagger-ui .opblock .opblock-summary-description {
+    color: #94a3b8;
+}
+
+/* GET */
+.swagger-ui .opblock.opblock-get {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background: #3b82f6;
+}
+
+/* POST */
+.swagger-ui .opblock.opblock-post {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background: #22c55e;
+}
+
+/* PUT */
+.swagger-ui .opblock.opblock-put {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+    background: #f59e0b;
+}
+
+/* DELETE */
+.swagger-ui .opblock.opblock-delete {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+    background: #ef4444;
+}
+
+/* --- Request Body / Response --- */
+.swagger-ui .opblock-body pre {
+    background: #1e293b !important;
+    border-radius: 6px;
+}
+.swagger-ui .opblock-section-header {
+    background: #1e293b;
+    border-color: #334155;
+}
+.swagger-ui .opblock-section-header h4 {
+    color: #e2e8f0;
+}
+.swagger-ui .opblock-description-wrapper,
+.swagger-ui .opblock-external-docs-wrapper {
+    color: #94a3b8;
+}
+
+/* --- Parameters --- */
+.swagger-ui .parameters-col_description {
+    color: #cbd5e1;
+}
+.swagger-ui .parameter__name {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+.swagger-ui .parameter__type {
+    color: #94a3b8;
+}
+.swagger-ui table thead tr td,
+.swagger-ui table thead tr th {
+    color: #94a3b8;
+    border-color: #334155;
+}
+
+/* --- Models --- */
+.swagger-ui .model-box {
+    background: #1e293b;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+.swagger-ui .model-title {
+    color: #e2e8f0;
+}
+.swagger-ui .model .property {
+    color: #cbd5e1;
+}
+.swagger-ui .model .property.primitive {
+    color: #a78bfa;
+}
+
+/* --- Responses --- */
+.swagger-ui .responses-inner h4,
+.swagger-ui .responses-inner h5 {
+    color: #e2e8f0;
+}
+.swagger-ui .response-col_status {
+    color: #f1f5f9;
+}
+.swagger-ui .response-col_description {
+    color: #94a3b8;
+}
+
+/* --- Buttons --- */
+.swagger-ui .btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+.swagger-ui .btn.authorize {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+.swagger-ui .btn.authorize:hover {
+    background: #2563eb;
+}
+.swagger-ui .btn.execute {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+
+/* --- Authorize Modal --- */
+.swagger-ui .auth-btn-wrapper .btn-done {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+
+/* --- Schema / Example tabs --- */
+.swagger-ui .tab li button.tablinks {
+    color: #94a3b8;
+}
+.swagger-ui .tab li button.tablinks.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+/* --- Servers dropdown --- */
+.swagger-ui .servers {
+    margin: 12px 0;
+}
+.swagger-ui .servers > label select {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 4px 12px;
+}

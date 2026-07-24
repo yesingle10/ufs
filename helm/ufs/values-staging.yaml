@@ -1,0 +1,52 @@
+# =============================================================================
+# UFS Core Helm Chart — Staging Override Values
+# Usage: helm install ufs ./helm/ufs -f helm/ufs/values-staging.yaml
+# =============================================================================
+
+replicaCount: 1
+
+springProfiles: docker,staging
+
+image:
+  tag: staging
+
+# ---- Resources (lower for staging) ----
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+# ---- MySQL ----
+mysql:
+  persistence:
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+
+# ---- Redis ----
+redis:
+  persistence:
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# ---- HPA disabled for staging ----
+hpa:
+  enabled: false
+
+# ---- Ingress disabled for staging ----
+ingress:
+  enabled: false

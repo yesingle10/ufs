@@ -1,0 +1,33 @@
+# Patterns to ignore when building Helm packages.
+# Operates similarly to .gitignore.
+# Common VCS files
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+
+# Common backup files
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+
+# Various IDEs
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Helm-related files
+.values.yaml
+values-*.yaml
