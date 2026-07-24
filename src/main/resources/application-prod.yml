@@ -1,0 +1,40 @@
+# =============================================================================
+# prod profile — 生产环境
+# 激活: spring.profiles.active=prod
+# 所有敏感配置必须通过环境变量 / KMS / Vault 注入，绝不落盘
+# =============================================================================
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 5000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      leak-detection-threshold: 60000
+  flyway:
+    clean-disabled: true
+    validate-on-migrate: true
+
+logging:
+  level:
+    com.ufs.core: WARN
+    com.ufs.core.repository: WARN
+    org.springframework.web: WARN
+    org.flywaydb: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+
+ufs:
+  jwt-ttl-seconds: 1800
+  sign-ttl-seconds: 120
+  nonce-ttl-seconds: 120

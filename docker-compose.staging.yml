@@ -1,0 +1,18 @@
+# =============================================================================
+# Docker Compose — staging override
+# 用法: docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d
+# =============================================================================
+services:
+  mysql:
+    ports:
+      - "3307:3306"
+
+  redis:
+    ports:
+      - "6380:6379"
+
+  ufs-core:
+    environment:
+      SPRING_PROFILES_ACTIVE: docker,staging
+    ports:
+      - "8081:8080"

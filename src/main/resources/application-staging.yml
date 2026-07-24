@@ -1,0 +1,33 @@
+# =============================================================================
+# staging profile — 预发布环境
+# 激活: spring.profiles.active=staging
+# 数据库/Redis 地址由环境变量注入，此处仅定义 profile 级行为
+# =============================================================================
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 600000
+  flyway:
+    clean-disabled: true
+
+logging:
+  level:
+    com.ufs.core: INFO
+    com.ufs.core.repository: DEBUG
+    org.springframework.web: INFO
+    org.flywaydb: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+
+ufs:
+  jwt-ttl-seconds: 3600
+  sign-ttl-seconds: 300
+  nonce-ttl-seconds: 300

@@ -1,0 +1,39 @@
+# =============================================================================
+# Docker Compose — production override
+# 用法: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# 生产注意事项:
+#   - MySQL/Redis 端口不对外暴露
+#   - 所有密码必须通过 .env 或 --env-file 注入
+#   - 建议搭配外部 MySQL/Redis（RDS/ElastiCache）而非容器化
+# =============================================================================
+services:
+  mysql:
+    ports:
+      - "127.0.0.1:3306:3306"
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 512m
+
+  redis:
+    ports:
+      - "127.0.0.1:6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 128m
+
+  ufs-core:
+    environment:
+      SPRING_PROFILES_ACTIVE: docker,prod
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+        reservations:
+          memory: 512m

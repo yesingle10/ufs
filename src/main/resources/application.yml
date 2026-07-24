@@ -54,7 +54,9 @@ springdoc:
     operations-sorter: method
   api-docs:
     path: /v3/api-docs
-  # 腾讯云 COS（生产由环境变量注入，绝不硬编码密钥）
+
+# 腾讯云 COS（生产由环境变量注入，绝不硬编码密钥）
+ufs:
   cos:
     secret-id: ${UFS_COS_SECRET_ID:}
     secret-key: ${UFS_COS_SECRET_KEY:}
@@ -79,11 +81,3 @@ springdoc:
     endpoint: ${UFS_TOS_ENDPOINT:}
     region: ${UFS_TOS_REGION:}
     default-bucket: ${UFS_TOS_DEFAULT_BUCKET:}
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    url: jdbc:mysql://localhost:3306/ufs_dev?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=UTC
