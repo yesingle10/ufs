@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
         <jjwt.version>0.12.5</jjwt.version>
-        <rocketmq.version>4.9.7</rocketmq.version>
+        <rocketmq.version>5.5.0</rocketmq.version>
     </properties>
 
     <dependencies>
