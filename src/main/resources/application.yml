@@ -45,6 +45,15 @@ ufs:
     namesrv-addr: localhost:9876
     audit-topic: ufs_audit
     producer-group: ufs_core_producer
+
+# Springdoc OpenAPI 文档
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
   # 腾讯云 COS（生产由环境变量注入，绝不硬编码密钥）
   cos:
     secret-id: ${UFS_COS_SECRET_ID:}

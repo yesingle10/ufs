@@ -6,6 +6,7 @@ import com.ufs.core.model.dto.policy.CreatePolicyRequest;
 import com.ufs.core.model.dto.policy.PolicyDto;
 import com.ufs.core.model.dto.policy.UpdatePolicyRequest;
 import com.ufs.core.service.PolicyService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/v1/policies")
+@Tag(name = "Policies", description = "存储策略管理")
 public class PolicyController {
 
     private final PolicyService service;

@@ -10,6 +10,7 @@ import com.ufs.core.model.dto.object.ObjectDto;
 import com.ufs.core.model.dto.object.PresignUploadRequest;
 import com.ufs.core.model.dto.object.PresignUploadResponse;
 import com.ufs.core.service.ObjectService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/v1/objects")
+@Tag(name = "Objects", description = "文件对象操作")
 public class ObjectController {
 
     private final ObjectService service;

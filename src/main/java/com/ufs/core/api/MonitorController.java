@@ -3,6 +3,7 @@ package com.ufs.core.api;
 import com.ufs.core.common.ApiResponse;
 import com.ufs.core.model.dto.monitor.MonitorResponse;
 import com.ufs.core.service.MonitorService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/v1/monitor")
+@Tag(name = "Monitor", description = "监控指标")
 public class MonitorController {
 
     private final MonitorService service;

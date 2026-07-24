@@ -9,6 +9,7 @@ import com.ufs.core.common.error.UfsException;
 import com.ufs.core.config.properties.UfsProperties;
 import com.ufs.core.model.dto.auth.IssueTokenRequest;
 import com.ufs.core.model.dto.auth.TokenResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/v1/auth")
+@Tag(name = "Auth", description = "JWT 鉴权")
 public class AuthController {
 
     private final CredentialResolver credentialResolver;

@@ -6,6 +6,7 @@ import com.ufs.core.model.dto.bucket.BucketDto;
 import com.ufs.core.model.dto.bucket.CreateBucketRequest;
 import com.ufs.core.model.dto.bucket.UpdateBucketRequest;
 import com.ufs.core.service.BucketService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/v1/buckets")
+@Tag(name = "Buckets", description = "存储桶管理")
 public class BucketController {
 
     private final BucketService service;

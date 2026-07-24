@@ -4,6 +4,7 @@ import com.ufs.core.common.ApiResponse;
 import com.ufs.core.common.PageResult;
 import com.ufs.core.model.dto.object.ObjectDto;
 import com.ufs.core.service.RecycleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/v1/recycle")
+@Tag(name = "Recycle", description = "回收站")
 public class RecycleController {
 
     private final RecycleService service;

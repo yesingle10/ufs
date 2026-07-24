@@ -4,6 +4,7 @@ import com.ufs.core.common.ApiResponse;
 import com.ufs.core.common.PageResult;
 import com.ufs.core.model.dto.audit.AuditLogDto;
 import com.ufs.core.service.AuditService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/v1/audit")
+@Tag(name = "Audit", description = "审计日志")
 public class AuditController {
 
     private final AuditService service;
