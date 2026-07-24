@@ -4,7 +4,7 @@
 # =============================================================================
 
 # ---- Stage 1: Build ----
-FROM maven:3.9-eclipse-temurin-17 AS builder
+FROM maven:3-eclipse-temurin-26 AS builder
 WORKDIR /build
 COPY pom.xml .
 # 下载依赖（利用 Docker layer cache）
