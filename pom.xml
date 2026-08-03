@@ -108,7 +108,7 @@
         <dependency>
             <groupId>com.qcloud</groupId>
             <artifactId>cos_api</artifactId>
-            <version>5.6.227</version>
+            <version>5.6.275</version>
             <optional>true</optional>
         </dependency>
         <!-- 阿里云 OSS SDK（optional） -->
